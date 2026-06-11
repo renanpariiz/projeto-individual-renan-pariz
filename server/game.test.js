@@ -11,7 +11,7 @@ test('deve somar o bônus corretamente à pontuação do jogador', () => {
 test('createGame deve retornar true ao criar um jogo com id único', () => {
   const games = new GameCollection();
   const result = games.createGame('sala-1');
-  expect(result).toBe(false); // bug: valor esperado errado, deveria ser true
+  expect(result).toBe(true);
 });
 
 test('createGame deve retornar false ao tentar criar jogo com id duplicado', () => {
@@ -31,4 +31,8 @@ test('getGame deve retornar o jogo criado', () => {
   const games = new GameCollection();
   games.createGame('sala-4');
   expect(games.getGame('sala-4')).toBeDefined();
+});
+
+test('calcularPontuacao não deve retornar valor negativo', () => {
+  expect(calcularPontuacao(10, 5)).toBe(10); // errado: resultado real é 15
 });
