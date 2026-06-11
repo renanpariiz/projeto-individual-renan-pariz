@@ -1,19 +1,22 @@
-// Função simulada que deveria somar pontos do jogador
-/* function calcularPontuacao(pontosAtuais, bonus) {
-    // Simulando um bug de código: esqueci de somar o bônus!
-    return pontosAtuais; 
-}
+const { GameCollection } = require('./games.js');
 
-test('Deve somar o bônus corretamente à pontuação do jogador', () => {
-    // Se o jogador tem 10 pontos e ganha 5 de bônus, deveria ser 15
-    expect(calcularPontuacao(10, 5)).toBe(15); 
-}); */
-
-// Função corrigida
 function calcularPontuacao(pontosAtuais, bonus) {
-    return pontosAtuais + bonus; // <-- Correção aqui!
+  return pontosAtuais + bonus;
 }
 
-test('Deve somar o bônus corretamente à pontuação do jogador', () => {
-    expect(calcularPontuacao(10, 5)).toBe(15); 
+test('deve somar o bônus corretamente à pontuação do jogador', () => {
+  expect(calcularPontuacao(10, 5)).toBe(15);
+});
+
+test('createGame deve retornar true ao criar um jogo com id único', () => {
+  const games = new GameCollection();
+  const result = games.createGame('sala-1');
+  expect(result).toBe(true);
+});
+
+test('createGame deve retornar false ao tentar criar jogo com id duplicado', () => {
+  const games = new GameCollection();
+  games.createGame('sala-2');
+  const result = games.createGame('sala-2');
+  expect(result).toBe(false);
 });
