@@ -60,11 +60,10 @@ GameCollection.prototype.getGame = function (id) {
 };
 
 GameCollection.prototype.createGame = function (id) {
-  if (this._games[game]) {
+  if (this._games[id]) {
     return false;
   }
-  var game = new Game(id, this);
-  this._games[id] = game;
+  this._games[id] = new Game(id, this);
   return true;
 };
 
