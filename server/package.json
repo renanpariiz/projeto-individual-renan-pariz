@@ -1,11 +1,25 @@
 {
-    "name": "mk.js-server",
-    "version": "0.0.1",
-    "author": "Minko Gechev @mgechev",
-    "description": "Node.js server for mk.js",
-    "dependencies": {
-        "express": "3.x.x",
-        "socket.io": "0.9.x"
-    },
-    "license": "MIT"
+  "name": "mk.js-server",
+  "version": "0.0.1",
+  "author": "Minko Gechev @mgechev",
+  "description": "Node.js server for mk.js",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pg": "^8.21.0",
+    "socket.io": "^4.6.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.4.1",
+    "fast-check": "^4.8.0",
+    "globals": "^17.6.0",
+    "jest": "^30.4.2"
+  }
 }
