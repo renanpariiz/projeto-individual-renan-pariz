@@ -1,0 +1,46 @@
+# =============================================================
+# Fase 2 - Docker Compose (DEV)
+# Integra o servidor Node.js com banco de dados PostgreSQL
+# =============================================================
+
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: gces_user
+      POSTGRES_PASSWORD: gces_senha
+      POSTGRES_DB: mk_game_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gces_user -d mk_game_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      # Monta o código local no container para hot-reload
+      - .:/app
+      # Preserva o node_modules do container (não sobrescreve com o local)
+      - /app/node_modules
+      # Monta o frontend estático
+      - ../game:/game
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgres://gces_user:gces_senha@db:5432/mk_game_db
+      - PORT=3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
