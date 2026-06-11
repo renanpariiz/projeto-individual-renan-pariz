@@ -34,5 +34,5 @@ test('getGame deve retornar o jogo criado', () => {
 });
 
 test('calcularPontuacao não deve retornar valor negativo', () => {
-  expect(calcularPontuacao(10, 5)).toBe(10); // errado: resultado real é 15
+  expect(calcularPontuacao(10, 5)).toBe(10); 
 });
