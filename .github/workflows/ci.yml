@@ -136,3 +136,5 @@ jobs:
         if: always()
         with:
           sarif_file: results.sarif
+    permissions:
+      security-events: write

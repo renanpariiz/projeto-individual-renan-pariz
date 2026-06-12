@@ -56,6 +56,9 @@ function GameCollection() {
 }
 
 GameCollection.prototype.getGame = function (id) {
+  if (typeof id !== 'string' && typeof id !== 'number') {
+    return undefined; // ou lançar um erro, dependendo da política de tratamento de erro desejada
+  }
   return this._games[id];
 };
 
