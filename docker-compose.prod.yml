@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: gces_user
+      POSTGRES_PASSWORD: gces_senha
+      POSTGRES_DB: mk_game_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gces_user -d mk_game_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    build:
+      context: ./server
+      dockerfile: Dockerfile.prod
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgres://gces_user:gces_senha@db:5432/mk_game_db
+      - PORT=3000
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - web
+
+volumes:
+  postgres_data:
