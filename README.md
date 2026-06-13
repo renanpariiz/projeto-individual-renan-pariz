@@ -1,33 +1,187 @@
-# Trabalho Individual - Gerência de Configuração e Evolução de Software (2026-1)
+# projeto-individual-renan-pariz
 
-Os conhecimentos de Gerência de Configuração e Evolução de Software (GCES) são fundamentais no ciclo de vida de um produto de software moderno. Este trabalho tem como objetivo exercitar os conceitos de automação, isolamento de ambiente, testes, segurança (DevSecOps) e deploy contínuo.
+Projeto Individual da disciplina de Gerência de Configuração e Evolução de Software (GCES 2026-1) — UnB.
 
-A aplicação base é o **mk.js**, um jogo de luta implementado com Backend em Node.js/Express e Frontend em HTML5 Canvas/JavaScript. O projeto original é considerado *deprecated* e possui dependências antigas; parte do desafio é modernizar o ambiente para que ele execute com versões estáveis atuais.
+A aplicação base é o **mk.js**, um jogo de luta implementado com Backend em Node.js/Express e Frontend em HTML5 Canvas. O projeto foi modernizado com containerização, pipelines de CI/CD, testes automatizados, análise de segurança e orquestração com Kubernetes.
 
-## Requisitos do Projeto
+---
 
-O trabalho está dividido em 10 etapas, cada uma valendo **1,0 ponto**. O foco é a implementação técnica aliada à correta documentação e histórico de commits.
+## Tecnologias
 
-### Critérios de Avaliação (10 Fases)
+- **Backend:** Node.js 20 + Express + Socket.io
+- **Banco de dados:** PostgreSQL 15
+- **Frontend:** HTML5 Canvas + JavaScript
+- **Containerização:** Docker + Docker Compose
+- **Servidor web:** Nginx
+- **CI/CD:** GitHub Actions
+- **Qualidade:** SonarCloud + ESLint + HTMLHint
+- **Segurança:** njsscan (SAST) + npm audit (SCA)
+- **Testes:** Jest + fast-check (Fuzzing)
+- **Orquestração:** Kubernetes + Cert Manager
 
-| Fase | Descrição Técnica | Nota por etapa |
+---
+
+## Pré-requisitos
+
+- [Docker](https://www.docker.com/) instalado
+- [Docker Compose](https://docs.docker.com/compose/) instalado
+- [Node.js 20+](https://nodejs.org/) (apenas para desenvolvimento local sem Docker)
+
+---
+
+## Ambiente de Desenvolvimento
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/renanpariiz/projeto-individual-renan-pariz.git
+cd projeto-individual-renan-pariz
+```
+
+### 2. Suba o ambiente com Docker Compose
+
+```bash
+cd server
+docker compose up --build
+```
+
+Isso irá:
+- Subir o servidor Node.js com **hot-reload** (alterações no código refletem imediatamente)
+- Subir o banco de dados PostgreSQL
+- Criar automaticamente a tabela de histórico de partidas
+
+### 3. Acesse a aplicação
+
+- **Jogo:** http://localhost:3000
+- **Histórico de partidas:** http://localhost:3000/api/matches
+
+### 4. Derrubar o ambiente
+
+```bash
+docker compose down
+```
+
+---
+
+## Ambiente de Produção
+
+### 1. Suba o ambiente de produção
+
+Na raiz do projeto:
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+Isso irá:
+- Build otimizado do servidor Node.js com multi-stage build
+- Nginx servindo o frontend estático na porta 80
+- PostgreSQL com volume persistente
+
+### 2. Acesse a aplicação
+
+- **Jogo:** http://localhost
+
+---
+
+## Testes
+
+### Rodar testes unitários
+
+```bash
+cd server
+npm install
+npm test
+```
+
+### Rodar testes de fuzzing
+
+```bash
+cd server
+npx jest fuzz.test.js
+```
+
+### Rodar lint
+
+```bash
+cd server
+npm run lint
+```
+
+---
+
+## Pipeline CI/CD
+
+O projeto possui dois pipelines automatizados via **GitHub Actions**:
+
+### CI — Build & Lint (`.github/workflows/ci.yml`)
+
+Roda a cada push na branch `main`:
+
+| Job | Descrição |
+|---|---|
+| Lint & Build - Backend | Verifica erros de lint no código Node.js |
+| Lint - Frontend | Verifica erros de lint no HTML com HTMLHint |
+| Testes Unitários - Backend | Roda os testes Jest |
+| Testes de Fuzzing - Backend | Valida resiliência do servidor com fast-check |
+| SCA - Verificação de Dependências | Verifica vulnerabilidades com npm audit |
+| SAST - Análise Estática de Segurança | Analisa o código com njsscan |
+| Qualidade de Código - SonarCloud | Envia métricas para o SonarCloud |
+
+### CD — Build & Push Images (`.github/workflows/cd.yml`)
+
+Roda a cada push na `main` e publica as imagens Docker no GitHub Container Registry (ghcr.io):
+
+- `ghcr.io/renanpariiz/projeto-individual-renan-pariz-server:latest`
+- `ghcr.io/renanpariiz/projeto-individual-renan-pariz-nginx:latest`
+
+---
+
+## Estrutura do Projeto
+
+```
+projeto-individual-renan-pariz/
+├── game/                        # Frontend (HTML5 Canvas)
+├── server/                      # Backend Node.js
+│   ├── Dockerfile.dev           # Dockerfile de desenvolvimento
+│   ├── Dockerfile.prod          # Dockerfile de produção (multi-stage)
+│   ├── docker-compose.yml       # Compose de desenvolvimento
+│   ├── server.js                # Servidor principal
+│   ├── games.js                 # Lógica de partidas
+│   ├── game.test.js             # Testes unitários
+│   ├── fuzz.test.js             # Testes de fuzzing
+│   └── package.json             # Dependências
+├── nginx/                       # Configuração do Nginx
+│   ├── Dockerfile               # Dockerfile do Nginx
+│   └── nginx.conf               # Configuração com redirect 80→443
+├── k8s/                         # Manifestos Kubernetes
+│   ├── namespace.yml
+│   ├── secret.yml
+│   ├── postgres.yml
+│   ├── server.yml
+│   ├── nginx.yml
+│   ├── cert-manager.yml         # ClusterIssuer Let's Encrypt
+│   └── ingress.yml              # Ingress com HTTPS
+├── .github/workflows/
+│   ├── ci.yml                   # Pipeline de CI
+│   └── cd.yml                   # Pipeline de CD
+├── docker-compose.prod.yml      # Compose de produção
+└── sonar-project.properties     # Configuração do SonarCloud
+```
+
+---
+
+## Fases do Projeto
+
+| Fase | Descrição | Status |
 |---|---|---|
-| 1. **Containerização (DEV)** | Elaboração de `Dockerfile` para ambiente de desenvolvimento com suporte a hot-reload (mudanças no código refletidas imediatamente no container). | 0-10% |
-| 2. **Docker Compose (DEV)** | Configuração de um `docker-compose.yml` que integre a aplicação e um banco de dados **Postgres**. Você deve implementar uma camada simples de persistência no código (ex: salvar histórico de lutas ou nomes de jogadores). | 10% - 20% |
-| 3. **CI - Build & Lint** | Automação das etapas de Build e Lint (Front e Back) via GitHub Actions. O pipeline deve falhar se o lint encontrar erros. | 20% - 30% |
-| 4. **CI - Testes Unitários** | Implementação de testes unitários funcionais. **Obrigatório:** Commits sequenciais demonstrando o teste quebrando no CI e, em seguida, passando após correção. | 30% - 40% |
-| 5. **CI - Testes de Fuzzing** | Implementação de testes de Fuzzing para validar a resiliência das entradas do servidor (Back-end) contra dados inesperados. | 40% - 50% |
-| 6. **Segurança - SAST & SCA** | Integração de ferramentas de análise estática de segurança (SAST) e verificação de vulnerabilidades em dependências (SCA - ex: Snyk ou npm audit). | 50% - 60% |
-| 7. **Qualidade de Código** | Integração completa com o **SonarCloud** no pipeline de CI, garantindo métricas de qualidade e cobertura mínima. | 60% - 70% |
-| 8. **Containerização (PROD)** | Elaboração de `Dockerfiles` otimizados para produção (multi-stage build, baseados em Alpine) e configuração do **Nginx** como servidor de arquivos estáticos. | 70% - 80% | 
-| 9. **Infraestrutura (K8s & Terraform)** | Criação de manifestos de **Kubernetes (K8s)** para orquestração da aplicação. Opcionalmente, utilize **Terraform** para provisionar a infraestrutura necessária. | 80% - 90% |
-| 10. **CD & Segurança de Rede** | Deploy Contínuo com publicação de imagens e configuração de **HTTPS via Cert Manager**. O Nginx deve redirecionar porta 80 para 443 e não expor outras portas para fora da rede de containers. | 90% - 100% |
-
-## Orientações Gerais
-
-*   **Repositório:** O trabalho deve ser desenvolvido em um repositório pessoal no GitHub.
-*   **Commits:** Devem ser atômicos e espaçados no tempo. Commits realizados todos juntos na data de entrega serão penalizados.
-*   **Modernização:** É responsabilidade do aluno atualizar o `package.json` e as dependências do servidor para garantir compatibilidade com as versões mais recentes do Node.js.
-*   **Documentação:** O `README.md` final deve conter o passo a passo de como subir o ambiente de desenvolvimento e como visualizar o ambiente de produção.
-
-Boa sorte!
+| 1 | Containerização DEV com hot-reload | ✅ |
+| 2 | Docker Compose com PostgreSQL e persistência | ✅ |
+| 3 | CI — Build & Lint (Frontend e Backend) | ✅ |
+| 4 | CI — Testes Unitários com ciclo TDD | ✅ |
+| 5 | CI — Testes de Fuzzing | ✅ |
+| 6 | Segurança — SAST & SCA | ✅ |
+| 7 | Qualidade — SonarCloud | ✅ |
+| 8 | Containerização PROD — multi-stage + Nginx | ✅ |
+| 9 | Infraestrutura — Kubernetes | ✅ |
+| 10 | CD & Segurança de Rede — HTTPS + Cert Manager | ✅ |
