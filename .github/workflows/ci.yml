@@ -121,6 +121,8 @@ jobs:
   sast-security:
     name: SAST - Análise Estática de Segurança
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write
 
     steps:
       - name: Checkout do código
@@ -136,5 +138,3 @@ jobs:
         if: always()
         with:
           sarif_file: results.sarif
-    permissions:
-      security-events: write
